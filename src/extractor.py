@@ -1,9 +1,6 @@
 import numpy as np
 import pandas as pd
 
-import numpy as np
-import pandas as pd
-
 def feature_control_kdd(df: pd.DataFrame) -> pd.DataFrame:
     features = [
     "duration",
@@ -46,12 +43,12 @@ def feature_control_kdd(df: pd.DataFrame) -> pd.DataFrame:
 
 def feature_control_cicids(df: pd.DataFrame) -> pd.DataFrame:
     features = [
-    "Flow Duration",
-    "Protocol",
-    "Total Fwd Bytes",
-    "Total Backward Bytes",
-    "Bytes per Second",
-    "Byte Ratio"
+    "duration",
+    "protocol",
+    "src_bytes",
+    "dst_bytes",
+    "bytes_per_sec",
+    "byte_ratio"
     ]
 
     df = df.copy()
