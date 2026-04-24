@@ -17,3 +17,7 @@ CICI_FRI_AFT_RAW_PATH = CICI_RAW_PATH / 'Friday-WorkingHours-Afternoon-DDos.pcap
 
 
 CICI_COMBINED_RAW_PATH = PROCESSED_DIR / 'cicids_combined.csv'
+
+KDD_TRAIN_CONTROL = PROCESSED_DIR / 'kdd_train_control.csv'
+KDD_TEST_CONTROL  = PROCESSED_DIR / 'kdd_test_control.csv'
+CICIDS_CONTROL    = PROCESSED_DIR / 'cicids_control.csv'

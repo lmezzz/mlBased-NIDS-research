@@ -8,7 +8,8 @@ def feature_control_kdd(df: pd.DataFrame) -> pd.DataFrame:
     "src_bytes",
     "dst_bytes",
     "bytes_per_sec",
-    "byte_ratio"  
+    "byte_ratio",
+    "label"
     ]
 
     df = df.copy()
@@ -22,12 +23,15 @@ def feature_control_kdd(df: pd.DataFrame) -> pd.DataFrame:
     df["duration"] = df["duration"].astype(float)
     df["src_bytes"] = df["src_bytes"].astype(float)
     df["dst_bytes"] = df["dst_bytes"].astype(float)
+    df["label"] = df["class"].copy()  # Keep original for label encoding later
 
 
     # Feature engineering
     df["bytes_per_sec"] = (df["src_bytes"] + df["dst_bytes"]) / (df["duration"] + 1e-6)
+    df["bytes_per_sec"] = df["bytes_per_sec"].replace([np.inf, -np.inf], 0)
 
     df["byte_ratio"] = df["src_bytes"] / (df["dst_bytes"] + 1)
+    df["byte_ratio"] = df["byte_ratio"].replace([np.inf, -np.inf], 0)
 
     print(f"[Extractor] KDD feature control applied. Resulting shape: {df.shape}")
     print(f"[Extractor] Sample features:\n{df[features].head(3)}")
@@ -38,7 +42,8 @@ def feature_control_kdd(df: pd.DataFrame) -> pd.DataFrame:
         "src_bytes",
         "dst_bytes",
         "bytes_per_sec",
-        "byte_ratio"
+        "byte_ratio",
+        "label"
     ]]
 
 def feature_control_cicids(df: pd.DataFrame) -> pd.DataFrame:
@@ -48,7 +53,8 @@ def feature_control_cicids(df: pd.DataFrame) -> pd.DataFrame:
     "src_bytes",
     "dst_bytes",
     "bytes_per_sec",
-    "byte_ratio"
+    "byte_ratio",
+    "label" 
     ]
 
     df = df.copy()
@@ -67,6 +73,7 @@ def feature_control_cicids(df: pd.DataFrame) -> pd.DataFrame:
     # Ensure numeric
     df["src_bytes"] = df["src_bytes"].astype(float)
     df["dst_bytes"] = df["dst_bytes"].astype(float)
+    df["label"] = df["Label"].copy()  # Keep original for label encoding later
 
     #converting the protocol int to string to make it same as KDD
     protocol_map = {6: "tcp", 17: "udp", 1: "icmp"}
@@ -74,8 +81,10 @@ def feature_control_cicids(df: pd.DataFrame) -> pd.DataFrame:
 
     # Feature engineering
     df["bytes_per_sec"] = (df["src_bytes"] + df["dst_bytes"]) / (df["duration"] + 1e-6)
+    df["bytes_per_sec"] = df["bytes_per_sec"].replace([np.inf, -np.inf], 0).fillna(0)
     
     df["byte_ratio"] = df["src_bytes"] / (df["dst_bytes"] + 1)
+    df["byte_ratio"] = df["byte_ratio"].replace([np.inf, -np.inf], 0)
 
     print(f"[Extractor] CICIDS feature control applied. Resulting shape: {df.shape}")
     print(f"[Extractor] Sample features:\n{df[features].head(3)}")
@@ -86,5 +95,6 @@ def feature_control_cicids(df: pd.DataFrame) -> pd.DataFrame:
         "src_bytes",
         "dst_bytes",
         "bytes_per_sec",
-        "byte_ratio"
+        "byte_ratio",
+        "label"
     ]]

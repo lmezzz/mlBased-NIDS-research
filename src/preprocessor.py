@@ -8,6 +8,8 @@ from sklearn.preprocessing import StandardScaler
 def encode_protocol(df):
     df = df.copy()
     df = pd.get_dummies(df, columns=["protocol"])  # it will create protocol_tcp, protocol_udp, protocol_icmp basically different columns for each protocol with 0/1 values
+    bool_cols = df.select_dtypes(include="bool").columns
+    df[bool_cols] = df[bool_cols].astype(int)
     return df
 
 
@@ -15,7 +17,8 @@ def encode_protocol(df):
 def log_transform(df):
     df = df.copy()
     
-    numeric_cols = df.select_dtypes(include=np.number).columns 
+    numeric_cols = df.select_dtypes(include=np.number).columns
+
     
     for col in numeric_cols:
         df[col] = np.log1p(df[col])
