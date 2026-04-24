@@ -16,4 +16,4 @@ CICI_RAW_PATH = RAW_DIR / 'MachineLearningCSV' / 'MachineLearningCVE'
 CICI_FRI_AFT_RAW_PATH = CICI_RAW_PATH / 'Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv'
 
 
-CICI_COMBINED_RAW_PATH = PROCESSED_DIR / 'CICI_Combined.csv'
+CICI_COMBINED_RAW_PATH = PROCESSED_DIR / 'cicids_combined.csv'
