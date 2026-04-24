@@ -30,7 +30,10 @@ for file in all_files:
 
     path = CICI_RAW_PATH / file
     if path.exists():
-        temp = pd.read_csv(path, low_memory=False)
+        try:
+            temp = pd.read_csv(path, encoding="utf-8", low_memory=False)
+        except UnicodeDecodeError:
+            temp = pd.read_csv(path, encoding="latin1", low_memory=False)
         dfs.append(temp)
         print(f"✓ Loaded: {file} → {temp.shape}")
     else:
