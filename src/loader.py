@@ -1,6 +1,6 @@
 from scipy.io import arff
 import pandas as pd
-from config import KDD_RAW_TEST_PATH, KDD_RAW_TRAIN_PATH, CICI_COMBINED_RAW_PATH
+from config import CICIDS_CONTROL, KDD_RAW_TEST_PATH, KDD_RAW_TRAIN_PATH, CICI_COMBINED_RAW_PATH, KDD_TEST_CONTROL, KDD_TRAIN_CONTROL
 
 def load_KDD_TEST() -> pd.DataFrame:
     print('[Loader] Loading the KDD test dataset')
@@ -27,6 +27,22 @@ def load_KDD_TRAIN() -> pd.DataFrame:
 def load_CICI_COMBINED() -> pd.DataFrame:
     print('[Loader] Loading the CICI combined dataset')
     df = pd.read_csv(CICI_COMBINED_RAW_PATH)
+    return df
+
+
+def load_CICI_CONTROL() -> pd.DataFrame:
+    print('[Loader] Loading the CICI control dataset')
+    df = pd.read_csv(CICIDS_CONTROL)
+    return df
+
+def load_KDD_CONTROL() -> pd.DataFrame:
+    print('[Loader] Loading the KDD control dataset')
+    df = pd.read_csv(KDD_TRAIN_CONTROL)
+    return df
+
+def load_KDD_TEST_CONTROL() -> pd.DataFrame:
+    print('[Loader] Loading the KDD test control dataset')
+    df = pd.read_csv(KDD_TEST_CONTROL)
     return df
 
 
