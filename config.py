@@ -53,3 +53,4 @@ KDD_TEST_LABELS  = PROCESSED_DIR / 'kdd_test_labels.csv'
 CICIDS_LABELS    = PROCESSED_DIR / 'cicids_labels.csv'
 
 MODELS_DIR = BASE_DIR / 'models'
+RESULTS_DIR = BASE_DIR / 'results'

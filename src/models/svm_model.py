@@ -12,7 +12,7 @@ from config import (
     KDD_TRAIN_EXP2, KDD_TEST_EXP2, CICIDS_EXP2,
     KDD_TRAIN_EXP3, KDD_TEST_EXP3, CICIDS_EXP3,
     KDD_TRAIN_EXP4, KDD_TEST_EXP4, CICIDS_EXP4,
-    KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5, MODELS_DIR,
+    KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5, MODELS_DIR, RESULTS_DIR,
 )
 
 NUMERIC_COLS = ["duration", "bytes_per_sec", "byte_ratio"]
@@ -68,6 +68,31 @@ def _run(train_path, test_path, cicids_path, feature_cols, exp_name):
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+    results = {
+        "model": "SVM",
+        "experiment": exp_name,
+        "within_f1": f1_within,
+        "cross_f1": f1_cross,
+        "within_recall": recall_score(y_test, y_pred_test),
+        "cross_recall": recall_score(y_cicids, y_pred_cicids),
+        "within_precision": precision_score(y_test, y_pred_test),
+        "cross_precision": precision_score(y_cicids, y_pred_cicids),
+        "performance_drop": f1_within - f1_cross,
+        "num_features": len(feature_cols)
+    }
+
+    results_file = RESULTS_DIR / "all_results.csv"
+
+    if results_file.exists():
+        df = pd.read_csv(results_file)
+        df = df[~((df["model"] == "SVM") &
+                (df["experiment"] == exp_name))]
+        df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
+    else:
+        df = pd.DataFrame([results])
+
+    df.to_csv(results_file, index=False)
+    print(f"[SVM] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
     joblib.dump({"model": model, "scaler": scaler, "features": feature_cols}, 

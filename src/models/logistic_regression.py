@@ -5,7 +5,7 @@ import joblib
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, f1_score, recall_score, precision_score
 from src.preprocessor import fit_scaler, apply_scaler
-from config import CICIDS_EXP1, CICIDS_EXP2, KDD_TRAIN_CONTROL, KDD_TEST_CONTROL, CICIDS_CONTROL , KDD_TRAIN_EXP1, KDD_TEST_EXP1 , KDD_TRAIN_EXP2, KDD_TEST_EXP2,KDD_TRAIN_EXP3, KDD_TEST_EXP3, CICIDS_EXP3 , KDD_TRAIN_EXP4, KDD_TEST_EXP4, CICIDS_EXP4 , KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5 , MODELS_DIR
+from config import CICIDS_EXP1, CICIDS_EXP2, KDD_TRAIN_CONTROL, KDD_TEST_CONTROL, CICIDS_CONTROL , KDD_TRAIN_EXP1, KDD_TEST_EXP1 , KDD_TRAIN_EXP2, KDD_TEST_EXP2,KDD_TRAIN_EXP3, KDD_TEST_EXP3, CICIDS_EXP3 , KDD_TRAIN_EXP4, KDD_TEST_EXP4, CICIDS_EXP4 , KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5 , MODELS_DIR, RESULTS_DIR
 
 
 
@@ -63,11 +63,36 @@ def run_logistic_regression():
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
 
+    results = {
+        "model": "LogisticRegression",
+        "experiment": "EXP0",
+        "within_f1": f1_within,
+        "cross_f1": f1_cross,
+        "within_recall": recall_score(y_test, y_pred_test),
+        "cross_recall": recall_score(y_cicids, y_pred_cicids),
+        "within_precision": precision_score(y_test, y_pred_test),
+        "cross_precision": precision_score(y_cicids, y_pred_cicids),
+        "performance_drop": f1_within - f1_cross,
+        "num_features": len(FEATURE_COLS)
+    }
+
+    results_file = RESULTS_DIR / "all_results.csv"
+
+    if results_file.exists():
+        df = pd.read_csv(results_file)
+        df = df[~((df["model"] == "LogisticRegression") &
+                (df["experiment"] == "EXP0"))]
+        df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
+    else:
+        df = pd.DataFrame([results])
+
+    df.to_csv(results_file, index=False)
+    print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
     joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
-            MODELS_DIR / "lr_base.pkl")
-    print("[LogReg] Model saved → lr_base.pkl")
+            MODELS_DIR / "lr_exp0.pkl")
+    print("[LogReg] Model saved → lr_exp0.pkl")
 
     return model, scaler
 
@@ -126,6 +151,33 @@ def run_logistic_regression_EXP1():
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+
+    results = {
+        "model": "LogisticRegression",
+        "experiment": "EXP1",
+        "within_f1": f1_within,
+        "cross_f1": f1_cross,
+        "within_recall": recall_score(y_test, y_pred_test),
+        "cross_recall": recall_score(y_cicids, y_pred_cicids),
+        "within_precision": precision_score(y_test, y_pred_test),
+        "cross_precision": precision_score(y_cicids, y_pred_cicids),
+        "performance_drop": f1_within - f1_cross,
+        "num_features": len(FEATURE_COLS)
+    }
+
+    results_file = RESULTS_DIR / "all_results.csv"
+
+    if results_file.exists():
+        df = pd.read_csv(results_file)
+        df = df[~((df["model"] == "LogisticRegression") &
+                (df["experiment"] == "EXP1"))]
+        df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
+    else:
+        df = pd.DataFrame([results])
+
+    df.to_csv(results_file, index=False)
+    print(f"[LogReg] Results saved → {results_file}")
+
     os.makedirs(MODELS_DIR, exist_ok=True)
     joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
                 MODELS_DIR / "lr_exp1.pkl")
@@ -187,6 +239,32 @@ def run_logistic_regression_EXP2():
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+
+    results = {
+        "model": "LogisticRegression",
+        "experiment": "EXP2",
+        "within_f1": f1_within,
+        "cross_f1": f1_cross,
+        "within_recall": recall_score(y_test, y_pred_test),
+        "cross_recall": recall_score(y_cicids, y_pred_cicids),
+        "within_precision": precision_score(y_test, y_pred_test),
+        "cross_precision": precision_score(y_cicids, y_pred_cicids),
+        "performance_drop": f1_within - f1_cross,
+        "num_features": len(FEATURE_COLS)
+    }
+
+    results_file = RESULTS_DIR / "all_results.csv"
+
+    if results_file.exists():
+        df = pd.read_csv(results_file)
+        df = df[~((df["model"] == "LogisticRegression") &
+                (df["experiment"] == "EXP2"))]
+        df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
+    else:
+        df = pd.DataFrame([results])
+
+    df.to_csv(results_file, index=False)
+    print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
     joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
@@ -251,6 +329,32 @@ def run_logistic_regression_EXP3():
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
 
+    results = {
+        "model": "LogisticRegression",
+        "experiment": "EXP3",
+        "within_f1": f1_within,
+        "cross_f1": f1_cross,
+        "within_recall": recall_score(y_test, y_pred_test),
+        "cross_recall": recall_score(y_cicids, y_pred_cicids),
+        "within_precision": precision_score(y_test, y_pred_test),
+        "cross_precision": precision_score(y_cicids, y_pred_cicids),
+        "performance_drop": f1_within - f1_cross,
+        "num_features": len(FEATURE_COLS)
+    }
+
+    results_file = RESULTS_DIR / "all_results.csv"
+
+    if results_file.exists():
+        df = pd.read_csv(results_file)
+        df = df[~((df["model"] == "LogisticRegression") &
+                (df["experiment"] == "EXP3"))]
+        df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
+    else:
+        df = pd.DataFrame([results])
+
+    df.to_csv(results_file, index=False)
+    print(f"[LogReg] Results saved → {results_file}")
+
     os.makedirs(MODELS_DIR, exist_ok=True)
     joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
                 MODELS_DIR / "lr_exp3.pkl")
@@ -311,6 +415,32 @@ def run_logistic_regression_EXP4():
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+
+    results = {
+        "model": "LogisticRegression",
+        "experiment": "EXP4",
+        "within_f1": f1_within,
+        "cross_f1": f1_cross,
+        "within_recall": recall_score(y_test, y_pred_test),
+        "cross_recall": recall_score(y_cicids, y_pred_cicids),
+        "within_precision": precision_score(y_test, y_pred_test),
+        "cross_precision": precision_score(y_cicids, y_pred_cicids),
+        "performance_drop": f1_within - f1_cross,
+        "num_features": len(FEATURE_COLS)
+    }
+
+    results_file = RESULTS_DIR / "all_results.csv"
+
+    if results_file.exists():
+        df = pd.read_csv(results_file)
+        df = df[~((df["model"] == "LogisticRegression") &
+                (df["experiment"] == "EXP4"))]
+        df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
+    else:
+        df = pd.DataFrame([results])
+
+    df.to_csv(results_file, index=False)
+    print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
     joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
@@ -377,6 +507,32 @@ def run_logistic_regression_EXP5():
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+
+    results = {
+        "model": "LogisticRegression",
+        "experiment": "EXP5",
+        "within_f1": f1_within,
+        "cross_f1": f1_cross,
+        "within_recall": recall_score(y_test, y_pred_test),
+        "cross_recall": recall_score(y_cicids, y_pred_cicids),
+        "within_precision": precision_score(y_test, y_pred_test),
+        "cross_precision": precision_score(y_cicids, y_pred_cicids),
+        "performance_drop": f1_within - f1_cross,
+        "num_features": len(FEATURE_COLS)
+    }
+
+    results_file = RESULTS_DIR / "all_results.csv"
+
+    if results_file.exists():
+        df = pd.read_csv(results_file)
+        df = df[~((df["model"] == "LogisticRegression") &
+                (df["experiment"] == "EXP5"))]
+        df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
+    else:
+        df = pd.DataFrame([results])
+
+    df.to_csv(results_file, index=False)
+    print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
     joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
