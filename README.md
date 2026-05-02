@@ -258,12 +258,14 @@ The model that looks best on the benchmark is consistently not the best real-wor
 
 ---
 
-## What Still Needs To Be Done
 
 ### Analysis
-- [ ] Feature importance analysis (RF coefficients per experiment)
+- [x] Feature importance analysis (RF coefficients per experiment)
+- [x] Evaluator script — formatted results table output
+
+## What Still Needs To Be Done
+
 - [ ] Per-attack-type CICIDS breakdown (which attack types caught vs missed)
-- [ ] Evaluator script — formatted results table output
 
 ### Paper
 - [ ] Abstract
