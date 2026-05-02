@@ -1,8 +1,11 @@
+import os
+from xml.parsers.expat import model
 import pandas as pd
+import joblib
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, f1_score, recall_score, precision_score
 from src.preprocessor import fit_scaler, apply_scaler
-from config import CICIDS_EXP1, CICIDS_EXP2, KDD_TRAIN_CONTROL, KDD_TEST_CONTROL, CICIDS_CONTROL , KDD_TRAIN_EXP1, KDD_TEST_EXP1 , KDD_TRAIN_EXP2, KDD_TEST_EXP2,KDD_TRAIN_EXP3, KDD_TEST_EXP3, CICIDS_EXP3 , KDD_TRAIN_EXP4, KDD_TEST_EXP4, CICIDS_EXP4 , KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5
+from config import CICIDS_EXP1, CICIDS_EXP2, KDD_TRAIN_CONTROL, KDD_TEST_CONTROL, CICIDS_CONTROL , KDD_TRAIN_EXP1, KDD_TEST_EXP1 , KDD_TRAIN_EXP2, KDD_TEST_EXP2,KDD_TRAIN_EXP3, KDD_TEST_EXP3, CICIDS_EXP3 , KDD_TRAIN_EXP4, KDD_TEST_EXP4, CICIDS_EXP4 , KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5 , MODELS_DIR
 
 
 
@@ -59,6 +62,12 @@ def run_logistic_regression():
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+
+
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+            MODELS_DIR / "lr_base.pkl")
+    print("[LogReg] Model saved → lr_base.pkl")
 
     return model, scaler
 
@@ -117,6 +126,10 @@ def run_logistic_regression_EXP1():
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+                MODELS_DIR / "lr_exp1.pkl")
+    print("[LogReg] Model saved → lr_exp1.pkl")
 
     return model, scaler
 
@@ -175,6 +188,12 @@ def run_logistic_regression_EXP2():
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
 
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+                MODELS_DIR / "lr_exp2.pkl")
+    print("[LogReg] Model saved → lr_exp2.pkl")
+
+
     return model, scaler
 
 def run_logistic_regression_EXP3():
@@ -232,6 +251,11 @@ def run_logistic_regression_EXP3():
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
 
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+                MODELS_DIR / "lr_exp3.pkl")
+    print("[LogReg] Model saved → lr_exp3.pkl")
+
     return model, scaler
 
 def run_logistic_regression_EXP4():
@@ -288,14 +312,23 @@ def run_logistic_regression_EXP4():
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
 
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+                MODELS_DIR / "lr_exp4.pkl")
+    print("[LogReg] Model saved → lr_exp4.pkl")
+
     return model, scaler
 
 def run_logistic_regression_EXP5():
     NUMERIC_COLS = ["duration", "bytes_per_sec", "byte_ratio"]
-    FEATURE_COLS = ["data_pkt_ratio","fin_ratio", "syn_ratio", "bytes_per_sec", "byte_ratio",
-                "protocol_tcp", "protocol_udp", "protocol_icmp" , "svc_http", "svc_ftp", "svc_dns" , "svc_ssh", 
-                "svc_https" , "svc_smtp" , "svc_telnet" , "svc_mysql" , "svc_rdp" , "svc_system" , "svc_user" , "svc_dynamic" , "svc_unknown"]
-
+    FEATURE_COLS = [
+        "duration", "bytes_per_sec", "byte_ratio",
+        "protocol_tcp", "protocol_udp", "protocol_icmp",
+        "syn_ratio", "rst_ratio", "fin_ratio", "data_pkt_ratio",
+        "svc_http", "svc_ftp", "svc_dns", "svc_ssh",
+        "svc_https", "svc_smtp", "svc_telnet", "svc_mysql",
+        "svc_rdp", "svc_system", "svc_user", "svc_dynamic", "svc_unknown"
+    ]
 
     print("[LogReg] Loading processed data...")
     train  = pd.read_csv(KDD_TRAIN_EXP5)
@@ -344,6 +377,11 @@ def run_logistic_regression_EXP5():
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+                MODELS_DIR / "lr_exp5.pkl")
+    print("[LogReg] Model saved → lr_exp5.pkl")
 
     return model, scaler
 

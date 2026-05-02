@@ -51,3 +51,5 @@ CICIDS_EXP5     = PROCESSED_DIR / 'cicids_exp5.csv'
 KDD_TRAIN_LABELS = PROCESSED_DIR / 'kdd_train_labels.csv'
 KDD_TEST_LABELS  = PROCESSED_DIR / 'kdd_test_labels.csv'
 CICIDS_LABELS    = PROCESSED_DIR / 'cicids_labels.csv'
+
+MODELS_DIR = BASE_DIR / 'models'

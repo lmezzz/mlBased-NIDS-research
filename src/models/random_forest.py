@@ -1,4 +1,6 @@
+import joblib
 import pandas as pd
+import os
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     classification_report, f1_score, recall_score, precision_score
@@ -10,7 +12,7 @@ from config import (
     KDD_TRAIN_EXP2, KDD_TEST_EXP2, CICIDS_EXP2,
     KDD_TRAIN_EXP3, KDD_TEST_EXP3, CICIDS_EXP3,
     KDD_TRAIN_EXP4, KDD_TEST_EXP4, CICIDS_EXP4,
-    KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5,
+    KDD_TRAIN_EXP5, KDD_TEST_EXP5, CICIDS_EXP5, MODELS_DIR,
 )
 
 NUMERIC_COLS = ["duration", "bytes_per_sec", "byte_ratio"]
@@ -66,6 +68,11 @@ def _run(train_path, test_path, cicids_path, feature_cols, exp_name):
     print(f"Within-dataset F1:  {f1_within:.4f}")
     print(f"Cross-dataset F1:   {f1_cross:.4f}")
     print(f"Performance drop:   {f1_within - f1_cross:.4f}")
+
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump({"model": model, "scaler": scaler, "features": feature_cols}, 
+                MODELS_DIR / f"rf_{exp_name.lower()}.pkl")
+    print(f"[RF] Model saved → rf_{exp_name.lower()}.pkl")
 
     return model, scaler
 
