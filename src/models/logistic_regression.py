@@ -544,7 +544,7 @@ def run_logistic_regression_EXP5():
 
 def run_logistic_regression_all_experiments():
     print("\n\n=== LOGISTIC REGRESSION CONTROL ===")
-    run_logistic_regression()
+    run_logistic_regression_EXP0()
     print("\n\n=== LOGISTIC REGRESSION EXPERIMENT 1 ===")
     run_logistic_regression_EXP1()
     print("\n\n=== LOGISTIC REGRESSION EXPERIMENT 2 ===")
