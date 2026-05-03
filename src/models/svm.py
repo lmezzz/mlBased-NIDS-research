@@ -95,7 +95,7 @@ def _run(train_path, test_path, cicids_path, feature_cols, exp_name):
     print(f"[SVM] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump({"model": model, "scaler": scaler, "features": feature_cols}, 
+    joblib.dump({"model": model, "scaler": scaler, "features": feature_cols , "numeric_cols": NUMERIC_COLS}, 
                 MODELS_DIR / f"svm_{exp_name.lower()}.pkl")
     print(f"[SVM] Model saved → svm_{exp_name.lower()}.pkl")
 

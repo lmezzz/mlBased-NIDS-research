@@ -9,7 +9,7 @@ from config import CICIDS_EXP1, CICIDS_EXP2, KDD_TRAIN_CONTROL, KDD_TEST_CONTROL
 
 
 
-def run_logistic_regression():
+def run_logistic_regression_EXP0():
 
     NUMERIC_COLS = ["duration", "src_bytes", "dst_bytes", "bytes_per_sec", "byte_ratio"]
     FEATURE_COLS = ["duration", "src_bytes", "dst_bytes", "bytes_per_sec", "byte_ratio",
@@ -90,7 +90,7 @@ def run_logistic_regression():
     print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS ,"numeric_cols": NUMERIC_COLS}, 
             MODELS_DIR / "lr_exp0.pkl")
     print("[LogReg] Model saved → lr_exp0.pkl")
 
@@ -179,7 +179,7 @@ def run_logistic_regression_EXP1():
     print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS, "numeric_cols": NUMERIC_COLS}, 
                 MODELS_DIR / "lr_exp1.pkl")
     print("[LogReg] Model saved → lr_exp1.pkl")
 
@@ -267,7 +267,7 @@ def run_logistic_regression_EXP2():
     print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS, "numeric_cols": NUMERIC_COLS}, 
                 MODELS_DIR / "lr_exp2.pkl")
     print("[LogReg] Model saved → lr_exp2.pkl")
 
@@ -356,7 +356,7 @@ def run_logistic_regression_EXP3():
     print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS, "numeric_cols": NUMERIC_COLS}, 
                 MODELS_DIR / "lr_exp3.pkl")
     print("[LogReg] Model saved → lr_exp3.pkl")
 
@@ -443,7 +443,7 @@ def run_logistic_regression_EXP4():
     print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS, "numeric_cols": NUMERIC_COLS}, 
                 MODELS_DIR / "lr_exp4.pkl")
     print("[LogReg] Model saved → lr_exp4.pkl")
 
@@ -535,7 +535,7 @@ def run_logistic_regression_EXP5():
     print(f"[LogReg] Results saved → {results_file}")
 
     os.makedirs(MODELS_DIR, exist_ok=True)
-    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS}, 
+    joblib.dump({"model": model, "scaler": scaler, "features": FEATURE_COLS, "numeric_cols": NUMERIC_COLS}, 
                 MODELS_DIR / "lr_exp5.pkl")
     print("[LogReg] Model saved → lr_exp5.pkl")
 

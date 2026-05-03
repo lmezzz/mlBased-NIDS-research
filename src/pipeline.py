@@ -4,7 +4,7 @@ from src.cleaner import clean_kdd, clean_cicids
 from src.extractor import feature_control_kdd, feature_control_cicids , feature_protocol_aware_kdd, feature_protocol_aware_cicids
 from src.aligner import align_kdd, align_cicids , align_protocol_aware_kdd, align_protocol_aware_cicids
 from src.preprocessor import encode_protocol, log_transform, fit_scaler, apply_scaler
-from config import KDD_TRAIN_CONTROL, KDD_TEST_CONTROL, CICIDS_CONTROL, PROTOCOL_AWARE_CICIDS, PROTOCOL_AWARE_KDD_TEST, PROTOCOL_AWARE_KDD_TRAIN
+from config import KDD_TRAIN_CONTROL, KDD_TEST_CONTROL, CICIDS_CONTROL, PROCESSED_DIR, PROTOCOL_AWARE_CICIDS, PROTOCOL_AWARE_KDD_TEST, PROTOCOL_AWARE_KDD_TRAIN
 
 def run_control_pipeline():
     print("[Pipeline] Running control feature pipeline...")
@@ -28,6 +28,12 @@ def run_control_pipeline():
     # ── CICIDS ──
     cicids = load_CICI_COMBINED()
     cicids = clean_cicids(cicids)
+
+    #saving the original label column before feature engineering for later use
+    cicids_raw = cicids.copy()
+    cicids_raw[["Label"]].to_csv(PROCESSED_DIR / "cicids_labels.csv", index=False)
+
+
     cicids = feature_control_cicids(cicids)
     cicids = log_transform(cicids)
     cicids["protocol_icmp"] = False # Ensure ICMP column exists for CICIDS

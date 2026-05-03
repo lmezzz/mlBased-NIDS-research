@@ -54,3 +54,4 @@ CICIDS_LABELS    = PROCESSED_DIR / 'cicids_labels.csv'
 
 MODELS_DIR = BASE_DIR / 'models'
 RESULTS_DIR = BASE_DIR / 'results'
+CICIDS_LABELS = PROCESSED_DIR / 'cicids_labels.csv'
