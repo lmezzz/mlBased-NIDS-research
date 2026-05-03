@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Compare all runs{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+  <div>
+    <div class="section-eyebrow">Side-by-side</div>
+    <div class="section-h">All experiments &mdash; within vs cross F1</div>
+    <p class="lede mb-0" style="max-width: 720px">
+      Pivot view of every (model, experiment) pair. Within-dataset F1 reflects KDD test
+      performance; cross-dataset F1 reflects CICIDS 2017. The drop column quantifies
+      generalization failure &mdash; the headline of the study.
+    </p>
+  </div>
+  <a href="{{ url_for('index') }}" class="btn btn-app">&larr; Home</a>
+</div>
+
+{% if pivot_html %}
+  <div class="card-app mb-4">
+    <div class="section-eyebrow">Pivot</div>
+    <h6 class="mb-3">Within F1 / Cross F1 / Drop &mdash; per model</h6>
+    <div class="table-responsive pivot-wrap">
+      {{ pivot_html|safe }}
+    </div>
+  </div>
+{% endif %}
+
+<div class="card-app">
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+      <div class="section-eyebrow">Raw rows</div>
+      <h6 class="mb-0">All 18 runs</h6>
+    </div>
+    <span class="small muted mono">results/experiment_results.csv</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table-app w-100">
+      <thead>
+        <tr>
+          <th>Model</th><th>Exp</th>
+          <th>Within F1</th><th>Cross F1</th><th>Drop</th>
+          <th>Within P</th><th>Within R</th>
+          <th>Cross P</th><th>Cross R</th>
+          <th>#feat</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td><strong>{{ r.model }}</strong></td>
+            <td><span class="mono">{{ r.experiment }}</span></td>
+            <td class="mono">{{ "%.4f"|format(r.within_f1) }}</td>
+            <td class="mono"
+                style="color: {% if r.cross_f1 >= 0.30 %}var(--success){% elif r.cross_f1 >= 0.15 %}var(--warning){% else %}var(--danger){% endif %}">
+              {{ "%.4f"|format(r.cross_f1) }}
+            </td>
+            <td class="mono" style="color: var(--warning)">{{ "%.4f"|format(r.performance_drop) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.within_precision) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.within_recall) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.cross_precision) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.cross_recall) }}</td>
+            <td class="mono muted">{{ r.num_features }}</td>
+            <td>
+              <a href="{{ url_for('view_results',
+                   model=({'LogisticRegression':'lr','RandomForest':'rf','SVM':'svm'}[r.model]),
+                   experiment=r.experiment) }}"
+                 class="btn btn-app btn-sm">open</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  /* Style the pandas-rendered pivot table to match the app theme */
+  .pivot-wrap table {
+    width: 100%;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .pivot-wrap thead th {
+    background: rgba(42,51,96,0.45);
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--line);
+    padding: 0.55rem 0.75rem;
+    text-align: right;
+  }
+  .pivot-wrap tbody th {
+    color: var(--text);
+    font-weight: 600;
+    padding: 0.55rem 0.75rem;
+    border-color: rgba(42,51,96,0.4);
+    text-align: left;
+  }
+  .pivot-wrap tbody td {
+    padding: 0.55rem 0.75rem;
+    border-color: rgba(42,51,96,0.4);
+    text-align: right;
+  }
+  .pivot-wrap tbody tr:hover { background: rgba(124,140,255,0.04); }
+</style>
+{% endblock %}

@@ -118,6 +118,26 @@ python src/experiments/attack_breakdown.py
 pytest tests/ -v -s
 ```
 
+### Step 6 — Launch the Interactive Demo (Flask)
+```bash
+python main.py
+# → http://127.0.0.1:5000
+```
+
+The demo is built on Strategy + Facade (see `src/strategies/`, `src/facade/`,
+`src/context.py`) and reads the saved `.pkl` artefacts in `models/` plus the
+results CSVs under `results/`. Three modes:
+
+1. **Browse results** — pick a (model, experiment), see saved metrics,
+   per-attack catch rates, and matching figures.
+2. **Live predict** — enter feature values (or sample a row from a prepared
+   dataset), see the model's BENIGN/ATTACK verdict + confidence score.
+   Requires the corresponding `.pkl` in `models/`.
+3. **Compare all** — pivot table of within vs cross F1 across all 18 runs.
+
+The legacy `run_*_EXPn` training scripts in `src/models/` are kept untouched
+for reproducibility. The Strategy classes wrap their saved artefacts read-only.
+
 ---
 
 ## Datasets

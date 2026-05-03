@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}NIDS Research Demo{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-0: #0b1020;
+      --bg-1: #111835;
+      --bg-2: #1a2247;
+      --line: #2a3360;
+      --text: #e6e9f5;
+      --muted: #8892b0;
+      --accent: #7c8cff;
+      --accent-2: #5eead4;
+      --danger: #f87171;
+      --success: #34d399;
+      --warning: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(1100px 600px at 10% -10%, rgba(124,140,255,0.18), transparent 60%),
+        radial-gradient(900px 500px at 90% -10%, rgba(94,234,212,0.10), transparent 60%),
+        var(--bg-0);
+      color: var(--text);
+      letter-spacing: -0.01em;
+      -webkit-font-smoothing: antialiased;
+    }
+    code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+    /* Navbar */
+    .navbar-app {
+      background: rgba(11, 16, 32, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 0.85rem 1.5rem;
+    }
+    .brand-mark {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none;
+    }
+    .brand-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px rgba(124,140,255,0.7);
+    }
+    .nav-pill {
+      color: var(--muted); padding: 0.4rem 0.9rem; border-radius: 999px;
+      text-decoration: none; font-weight: 500; font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+    .nav-pill:hover { color: var(--text); background: var(--bg-2); }
+    .nav-pill.active { color: var(--text); background: var(--bg-2); border: 1px solid var(--line); }
+
+    /* Cards */
+    .card-app {
+      background: linear-gradient(180deg, rgba(26,34,71,0.6), rgba(17,24,53,0.6));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1.5rem;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .card-app.hoverable:hover {
+      border-color: rgba(124,140,255,0.4);
+      transform: translateY(-2px);
+    }
+    .card-app h4, .card-app h5, .card-app h6 { color: var(--text); font-weight: 600; }
+    .card-app .lede { color: var(--muted); font-size: 0.88rem; line-height: 1.55; }
+
+    /* Hero */
+    .hero {
+      padding: 2.4rem 2rem 2rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(124,140,255,0.10), rgba(94,234,212,0.06)),
+        linear-gradient(180deg, rgba(26,34,71,0.7), rgba(17,24,53,0.7));
+      margin-bottom: 1.75rem;
+    }
+    .hero h1 {
+      font-size: 1.9rem; font-weight: 800; margin-bottom: 0.5rem;
+      background: linear-gradient(120deg, #fff 0%, #cbd5ff 60%, #5eead4 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p { color: var(--muted); max-width: 720px; }
+    .hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1rem; font-size: 0.85rem; color: var(--muted); }
+    .hero-meta b { color: var(--text); font-weight: 600; }
+
+    /* Buttons */
+    .btn-app {
+      border-radius: 10px; font-weight: 500; padding: 0.5rem 1rem;
+      border: 1px solid var(--line); background: var(--bg-2); color: var(--text);
+      transition: all 0.15s ease;
+    }
+    .btn-app:hover { background: var(--line); color: var(--text); }
+    .btn-primary-app {
+      border: none; color: #0b1020; font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+    .btn-primary-app:hover { filter: brightness(1.08); color: #0b1020; }
+    .btn-success-app {
+      border: 1px solid rgba(52,211,153,0.4); color: var(--success);
+      background: rgba(52,211,153,0.08);
+    }
+    .btn-success-app:hover { background: rgba(52,211,153,0.16); color: var(--success); }
+    .btn-danger-app {
+      border: 1px solid rgba(248,113,113,0.4); color: var(--danger);
+      background: rgba(248,113,113,0.08);
+    }
+    .btn-danger-app:hover { background: rgba(248,113,113,0.16); color: var(--danger); }
+
+    /* Form controls */
+    .form-control, .form-select {
+      background: var(--bg-1); border: 1px solid var(--line); color: var(--text);
+      border-radius: 8px; font-size: 0.9rem;
+    }
+    .form-control:focus, .form-select:focus {
+      background: var(--bg-1); color: var(--text);
+      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,140,255,0.18);
+    }
+    .form-label { color: var(--muted); font-size: 0.78rem; font-weight: 500;
+                  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+
+    /* Tables */
+    .table-app { color: var(--text); font-size: 0.88rem; margin-bottom: 0; }
+    .table-app thead th {
+      background: rgba(42,51,96,0.45);
+      color: var(--muted); font-weight: 500;
+      text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--line); padding: 0.75rem;
+    }
+    .table-app tbody td { padding: 0.65rem 0.75rem; border-color: rgba(42,51,96,0.4); }
+    .table-app tbody tr:hover { background: rgba(124,140,255,0.04); }
+
+    /* Status indicators */
+    .status-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      margin-right: 0.45rem; vertical-align: middle;
+    }
+    .status-ready  { background: var(--success); box-shadow: 0 0 8px rgba(52,211,153,0.6); }
+    .status-missing { background: var(--warning); box-shadow: 0 0 8px rgba(251,191,36,0.5); }
+
+    /* Metric tiles */
+    .metric-tile {
+      background: linear-gradient(180deg, rgba(26,34,71,0.55), rgba(17,24,53,0.55));
+      border: 1px solid var(--line); border-radius: 14px;
+      padding: 1.2rem; text-align: center;
+    }
+    .metric-tile .label {
+      font-size: 0.72rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500;
+    }
+    .metric-tile .value {
+      font-size: 1.85rem; font-weight: 700; margin-top: 0.3rem;
+      font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    }
+    .metric-tile.accent .value { color: var(--accent-2); }
+    .metric-tile.warn   .value { color: var(--warning); }
+    .metric-tile.danger .value { color: var(--danger); }
+
+    /* Verdict badge */
+    .verdict {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.55rem 1.1rem; border-radius: 999px;
+      font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em;
+    }
+    .verdict.attack {
+      color: var(--danger); background: rgba(248,113,113,0.12);
+      border: 1px solid rgba(248,113,113,0.4);
+    }
+    .verdict.benign {
+      color: var(--success); background: rgba(52,211,153,0.12);
+      border: 1px solid rgba(52,211,153,0.4);
+    }
+
+    /* Section heading */
+    .section-eyebrow {
+      font-size: 0.72rem; color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem;
+    }
+    .section-h { font-weight: 700; font-size: 1.4rem; margin-bottom: 0.25rem; }
+
+    /* Misc */
+    .muted { color: var(--muted); }
+    .figure-thumb {
+      max-width: 100%; border: 1px solid var(--line);
+      border-radius: 10px; transition: border-color 0.2s ease;
+    }
+    .figure-thumb:hover { border-color: var(--accent); }
+    pre {
+      background: var(--bg-0); border: 1px solid var(--line);
+      border-radius: 8px; padding: 0.8rem; color: var(--text); font-size: 0.78rem;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-2); }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg-0); }
+    ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a4480; }
+
+    footer { border-top: 1px solid var(--line); padding: 1.4rem 0; margin-top: 3rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <nav class="navbar-app d-flex justify-content-between align-items-center">
+    <a class="brand-mark" href="{{ url_for('index') }}">
+      <span class="brand-dot"></span>
+      NIDS Research Demo
+    </a>
+    <div class="d-flex gap-1">
+      <a class="nav-pill {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Home</a>
+      <a class="nav-pill {% if request.endpoint == 'compare' %}active{% endif %}" href="{{ url_for('compare') }}">Compare</a>
+      <a class="nav-pill {% if request.endpoint == 'predict' %}active{% endif %}" href="{{ url_for('predict') }}">Predict</a>
+    </div>
+  </nav>
+
+  <main class="container-xl py-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="container-xl d-flex justify-content-between align-items-center small">
+      <span>Strategy + Facade refactor &middot; saved artefacts read-only</span>
+      <span class="mono">NSL-KDD &times; CICIDS 2017</span>
+    </div>
+  </footer>
+</body>
+</html>
