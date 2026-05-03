@@ -1,0 +1,271 @@
+attack_type,total,caught,missed,catch_rate,model,experiment
+Heartbleed,11,0,11,0.0,lr,exp0
+Infiltration,36,5,31,0.1389,lr,exp0
+BENIGN,227129,54519,172610,0.24,lr,exp0
+DoS GoldenEye,1029,247,782,0.24,lr,exp0
+Bot,196,53,143,0.2704,lr,exp0
+DoS Hulk,23012,7473,15539,0.3247,lr,exp0
+DDoS,12802,4652,8150,0.3634,lr,exp0
+Web Attack  Sql Injection,21,9,12,0.4286,lr,exp0
+FTP-Patator,794,377,417,0.4748,lr,exp0
+SSH-Patator,590,291,299,0.4932,lr,exp0
+PortScan,15880,7944,7936,0.5003,lr,exp0
+DoS slowloris,580,401,179,0.6914,lr,exp0
+DoS Slowhttptest,550,483,67,0.8782,lr,exp0
+Web Attack  Brute Force,151,143,8,0.947,lr,exp0
+Web Attack  XSS,65,63,2,0.9692,lr,exp0
+Heartbleed,11,0,11,0.0,lr,exp1
+Bot,196,0,196,0.0,lr,exp1
+PortScan,15880,56,15824,0.0035,lr,exp1
+Infiltration,36,1,35,0.0278,lr,exp1
+BENIGN,227129,45727,181402,0.2013,lr,exp1
+DoS GoldenEye,1029,247,782,0.24,lr,exp1
+DoS Hulk,23012,7324,15688,0.3183,lr,exp1
+DDoS,12802,4648,8154,0.3631,lr,exp1
+Web Attack  Sql Injection,21,9,12,0.4286,lr,exp1
+FTP-Patator,794,390,404,0.4912,lr,exp1
+SSH-Patator,590,291,299,0.4932,lr,exp1
+DoS slowloris,580,381,199,0.6569,lr,exp1
+DoS Slowhttptest,550,467,83,0.8491,lr,exp1
+Web Attack  Brute Force,151,143,8,0.947,lr,exp1
+Web Attack  XSS,65,63,2,0.9692,lr,exp1
+PortScan,15880,0,15880,0.0,lr,exp2
+DDoS,12802,0,12802,0.0,lr,exp2
+DoS Hulk,23012,0,23012,0.0,lr,exp2
+Infiltration,36,0,36,0.0,lr,exp2
+Web Attack  Brute Force,151,0,151,0.0,lr,exp2
+DoS GoldenEye,1029,0,1029,0.0,lr,exp2
+Web Attack  XSS,65,0,65,0.0,lr,exp2
+Bot,196,0,196,0.0,lr,exp2
+Heartbleed,11,0,11,0.0,lr,exp2
+Web Attack  Sql Injection,21,0,21,0.0,lr,exp2
+SSH-Patator,590,1,589,0.0017,lr,exp2
+BENIGN,227129,8192,218937,0.0361,lr,exp2
+DoS Slowhttptest,550,95,455,0.1727,lr,exp2
+DoS slowloris,580,172,408,0.2966,lr,exp2
+FTP-Patator,794,390,404,0.4912,lr,exp2
+PortScan,15880,0,15880,0.0,lr,exp3
+DDoS,12802,0,12802,0.0,lr,exp3
+DoS Hulk,23012,0,23012,0.0,lr,exp3
+Infiltration,36,0,36,0.0,lr,exp3
+Web Attack  Brute Force,151,0,151,0.0,lr,exp3
+DoS GoldenEye,1029,0,1029,0.0,lr,exp3
+Web Attack  XSS,65,0,65,0.0,lr,exp3
+Bot,196,0,196,0.0,lr,exp3
+Heartbleed,11,0,11,0.0,lr,exp3
+Web Attack  Sql Injection,21,0,21,0.0,lr,exp3
+SSH-Patator,590,1,589,0.0017,lr,exp3
+BENIGN,227129,7442,219687,0.0328,lr,exp3
+DoS Slowhttptest,550,95,455,0.1727,lr,exp3
+DoS slowloris,580,172,408,0.2966,lr,exp3
+FTP-Patator,794,310,484,0.3904,lr,exp3
+DDoS,12802,1237,11565,0.0966,lr,exp4
+Infiltration,36,5,31,0.1389,lr,exp4
+FTP-Patator,794,392,402,0.4937,lr,exp4
+SSH-Patator,590,293,297,0.4966,lr,exp4
+Bot,196,132,64,0.6735,lr,exp4
+BENIGN,227129,172753,54376,0.7606,lr,exp4
+DoS Hulk,23012,21699,1313,0.9429,lr,exp4
+Web Attack  Brute Force,151,149,2,0.9868,lr,exp4
+DoS GoldenEye,1029,1019,10,0.9903,lr,exp4
+PortScan,15880,15836,44,0.9972,lr,exp4
+DoS slowloris,580,580,0,1.0,lr,exp4
+DoS Slowhttptest,550,550,0,1.0,lr,exp4
+Web Attack  XSS,65,65,0,1.0,lr,exp4
+Web Attack  Sql Injection,21,21,0,1.0,lr,exp4
+Heartbleed,11,11,0,1.0,lr,exp4
+DDoS,12802,0,12802,0.0,lr,exp5
+DoS Hulk,23012,0,23012,0.0,lr,exp5
+Web Attack  Sql Injection,21,0,21,0.0,lr,exp5
+Heartbleed,11,0,11,0.0,lr,exp5
+Infiltration,36,0,36,0.0,lr,exp5
+Web Attack  Brute Force,151,0,151,0.0,lr,exp5
+DoS GoldenEye,1029,0,1029,0.0,lr,exp5
+Web Attack  XSS,65,0,65,0.0,lr,exp5
+DoS Slowhttptest,550,21,529,0.0382,lr,exp5
+DoS slowloris,580,61,519,0.1052,lr,exp5
+BENIGN,227129,65919,161210,0.2902,lr,exp5
+Bot,196,78,118,0.398,lr,exp5
+FTP-Patator,794,390,404,0.4912,lr,exp5
+SSH-Patator,590,291,299,0.4932,lr,exp5
+PortScan,15880,15648,232,0.9854,lr,exp5
+FTP-Patator,794,0,794,0.0,rf,exp0
+Heartbleed,11,0,11,0.0,rf,exp0
+DDoS,12802,121,12681,0.0095,rf,exp0
+Infiltration,36,1,35,0.0278,rf,exp0
+DoS Slowhttptest,550,31,519,0.0564,rf,exp0
+DoS GoldenEye,1029,137,892,0.1331,rf,exp0
+BENIGN,227129,52068,175061,0.2292,rf,exp0
+DoS Hulk,23012,6656,16356,0.2892,rf,exp0
+DoS slowloris,580,175,405,0.3017,rf,exp0
+Web Attack  Sql Injection,21,9,12,0.4286,rf,exp0
+SSH-Patator,590,289,301,0.4898,rf,exp0
+PortScan,15880,8069,7811,0.5081,rf,exp0
+Bot,196,132,64,0.6735,rf,exp0
+Web Attack  Brute Force,151,143,8,0.947,rf,exp0
+Web Attack  XSS,65,63,2,0.9692,rf,exp0
+FTP-Patator,794,0,794,0.0,rf,exp1
+Heartbleed,11,0,11,0.0,rf,exp1
+DDoS,12802,333,12469,0.026,rf,exp1
+DoS Slowhttptest,550,31,519,0.0564,rf,exp1
+Infiltration,36,4,32,0.1111,rf,exp1
+DoS GoldenEye,1029,143,886,0.139,rf,exp1
+DoS Hulk,23012,6468,16544,0.2811,rf,exp1
+DoS slowloris,580,175,405,0.3017,rf,exp1
+Bot,196,79,117,0.4031,rf,exp1
+Web Attack  Sql Injection,21,9,12,0.4286,rf,exp1
+BENIGN,227129,102592,124537,0.4517,rf,exp1
+SSH-Patator,590,542,48,0.9186,rf,exp1
+Web Attack  Brute Force,151,143,8,0.947,rf,exp1
+Web Attack  XSS,65,63,2,0.9692,rf,exp1
+PortScan,15880,15844,36,0.9977,rf,exp1
+FTP-Patator,794,0,794,0.0,rf,exp2
+Heartbleed,11,0,11,0.0,rf,exp2
+DoS Slowhttptest,550,2,548,0.0036,rf,exp2
+DoS slowloris,580,3,577,0.0052,rf,exp2
+DDoS,12802,180,12622,0.0141,rf,exp2
+Infiltration,36,1,35,0.0278,rf,exp2
+DoS GoldenEye,1029,156,873,0.1516,rf,exp2
+Bot,196,53,143,0.2704,rf,exp2
+DoS Hulk,23012,6468,16544,0.2811,rf,exp2
+Web Attack  Sql Injection,21,9,12,0.4286,rf,exp2
+SSH-Patator,590,289,301,0.4898,rf,exp2
+PortScan,15880,7786,8094,0.4903,rf,exp2
+BENIGN,227129,131800,95329,0.5803,rf,exp2
+Web Attack  Brute Force,151,145,6,0.9603,rf,exp2
+Web Attack  XSS,65,63,2,0.9692,rf,exp2
+FTP-Patator,794,0,794,0.0,rf,exp3
+DDoS,12802,0,12802,0.0,rf,exp3
+Infiltration,36,0,36,0.0,rf,exp3
+Bot,196,0,196,0.0,rf,exp3
+Heartbleed,11,0,11,0.0,rf,exp3
+DoS Slowhttptest,550,1,549,0.0018,rf,exp3
+PortScan,15880,50,15830,0.0031,rf,exp3
+DoS slowloris,580,2,578,0.0034,rf,exp3
+DoS GoldenEye,1029,9,1020,0.0087,rf,exp3
+Web Attack  XSS,65,2,63,0.0308,rf,exp3
+Web Attack  Brute Force,151,19,132,0.1258,rf,exp3
+DoS Hulk,23012,6441,16571,0.2799,rf,exp3
+Web Attack  Sql Injection,21,9,12,0.4286,rf,exp3
+BENIGN,227129,109692,117437,0.483,rf,exp3
+SSH-Patator,590,289,301,0.4898,rf,exp3
+FTP-Patator,794,0,794,0.0,rf,exp4
+DDoS,12802,0,12802,0.0,rf,exp4
+Infiltration,36,0,36,0.0,rf,exp4
+Bot,196,0,196,0.0,rf,exp4
+Heartbleed,11,0,11,0.0,rf,exp4
+DoS Slowhttptest,550,1,549,0.0018,rf,exp4
+PortScan,15880,50,15830,0.0031,rf,exp4
+DoS slowloris,580,2,578,0.0034,rf,exp4
+DoS GoldenEye,1029,9,1020,0.0087,rf,exp4
+Web Attack  XSS,65,2,63,0.0308,rf,exp4
+BENIGN,227129,25948,201181,0.1142,rf,exp4
+Web Attack  Brute Force,151,19,132,0.1258,rf,exp4
+DoS Hulk,23012,6437,16575,0.2797,rf,exp4
+Web Attack  Sql Injection,21,9,12,0.4286,rf,exp4
+SSH-Patator,590,289,301,0.4898,rf,exp4
+FTP-Patator,794,0,794,0.0,rf,exp5
+DDoS,12802,0,12802,0.0,rf,exp5
+DoS Slowhttptest,550,0,550,0.0,rf,exp5
+DoS Hulk,23012,0,23012,0.0,rf,exp5
+DoS slowloris,580,0,580,0.0,rf,exp5
+Web Attack  Brute Force,151,0,151,0.0,rf,exp5
+DoS GoldenEye,1029,0,1029,0.0,rf,exp5
+Web Attack  XSS,65,0,65,0.0,rf,exp5
+Heartbleed,11,0,11,0.0,rf,exp5
+Web Attack  Sql Injection,21,0,21,0.0,rf,exp5
+Infiltration,36,0,36,0.0,rf,exp5
+BENIGN,227129,35890,191239,0.158,rf,exp5
+Bot,196,55,141,0.2806,rf,exp5
+PortScan,15880,7186,8694,0.4525,rf,exp5
+SSH-Patator,590,289,301,0.4898,rf,exp5
+Heartbleed,11,0,11,0.0,svm,exp0
+Infiltration,36,5,31,0.1389,svm,exp0
+DoS GoldenEye,1029,247,782,0.24,svm,exp0
+BENIGN,227129,64964,162165,0.286,svm,exp0
+DoS Hulk,23012,7474,15538,0.3248,svm,exp0
+DDoS,12802,4656,8146,0.3637,svm,exp0
+Web Attack  Sql Injection,21,9,12,0.4286,svm,exp0
+FTP-Patator,794,390,404,0.4912,svm,exp0
+SSH-Patator,590,291,299,0.4932,svm,exp0
+Bot,196,123,73,0.6276,svm,exp0
+DoS slowloris,580,391,189,0.6741,svm,exp0
+DoS Slowhttptest,550,456,94,0.8291,svm,exp0
+Web Attack  Brute Force,151,143,8,0.947,svm,exp0
+Web Attack  XSS,65,63,2,0.9692,svm,exp0
+PortScan,15880,15872,8,0.9995,svm,exp0
+Heartbleed,11,0,11,0.0,svm,exp1
+Bot,196,0,196,0.0,svm,exp1
+PortScan,15880,121,15759,0.0076,svm,exp1
+Infiltration,36,2,34,0.0556,svm,exp1
+BENIGN,227129,51133,175996,0.2251,svm,exp1
+DoS GoldenEye,1029,247,782,0.24,svm,exp1
+DoS Hulk,23012,7361,15651,0.3199,svm,exp1
+DDoS,12802,4648,8154,0.3631,svm,exp1
+Web Attack  Sql Injection,21,9,12,0.4286,svm,exp1
+FTP-Patator,794,390,404,0.4912,svm,exp1
+SSH-Patator,590,291,299,0.4932,svm,exp1
+DoS slowloris,580,341,239,0.5879,svm,exp1
+DoS Slowhttptest,550,351,199,0.6382,svm,exp1
+Web Attack  Brute Force,151,143,8,0.947,svm,exp1
+Web Attack  XSS,65,63,2,0.9692,svm,exp1
+PortScan,15880,0,15880,0.0,svm,exp2
+DDoS,12802,0,12802,0.0,svm,exp2
+DoS Hulk,23012,0,23012,0.0,svm,exp2
+Infiltration,36,0,36,0.0,svm,exp2
+Web Attack  Brute Force,151,0,151,0.0,svm,exp2
+DoS GoldenEye,1029,0,1029,0.0,svm,exp2
+Web Attack  XSS,65,0,65,0.0,svm,exp2
+Bot,196,0,196,0.0,svm,exp2
+Heartbleed,11,0,11,0.0,svm,exp2
+Web Attack  Sql Injection,21,0,21,0.0,svm,exp2
+SSH-Patator,590,1,589,0.0017,svm,exp2
+BENIGN,227129,7461,219668,0.0328,svm,exp2
+DoS Slowhttptest,550,95,455,0.1727,svm,exp2
+DoS slowloris,580,172,408,0.2966,svm,exp2
+FTP-Patator,794,373,421,0.4698,svm,exp2
+PortScan,15880,0,15880,0.0,svm,exp3
+DDoS,12802,0,12802,0.0,svm,exp3
+DoS Hulk,23012,0,23012,0.0,svm,exp3
+Infiltration,36,0,36,0.0,svm,exp3
+Web Attack  Brute Force,151,0,151,0.0,svm,exp3
+DoS GoldenEye,1029,0,1029,0.0,svm,exp3
+Web Attack  XSS,65,0,65,0.0,svm,exp3
+Bot,196,0,196,0.0,svm,exp3
+Heartbleed,11,0,11,0.0,svm,exp3
+Web Attack  Sql Injection,21,0,21,0.0,svm,exp3
+SSH-Patator,590,1,589,0.0017,svm,exp3
+BENIGN,227129,3014,224115,0.0133,svm,exp3
+DoS Slowhttptest,550,95,455,0.1727,svm,exp3
+DoS slowloris,580,172,408,0.2966,svm,exp3
+FTP-Patator,794,273,521,0.3438,svm,exp3
+PortScan,15880,0,15880,0.0,svm,exp4
+DDoS,12802,0,12802,0.0,svm,exp4
+DoS Hulk,23012,0,23012,0.0,svm,exp4
+Infiltration,36,0,36,0.0,svm,exp4
+Web Attack  Brute Force,151,0,151,0.0,svm,exp4
+DoS GoldenEye,1029,0,1029,0.0,svm,exp4
+Web Attack  XSS,65,0,65,0.0,svm,exp4
+Bot,196,0,196,0.0,svm,exp4
+Heartbleed,11,0,11,0.0,svm,exp4
+Web Attack  Sql Injection,21,0,21,0.0,svm,exp4
+SSH-Patator,590,1,589,0.0017,svm,exp4
+BENIGN,227129,6354,220775,0.028,svm,exp4
+DoS Slowhttptest,550,95,455,0.1727,svm,exp4
+DoS slowloris,580,172,408,0.2966,svm,exp4
+FTP-Patator,794,390,404,0.4912,svm,exp4
+DDoS,12802,0,12802,0.0,svm,exp5
+DoS Hulk,23012,0,23012,0.0,svm,exp5
+Web Attack  Sql Injection,21,0,21,0.0,svm,exp5
+Heartbleed,11,0,11,0.0,svm,exp5
+Infiltration,36,0,36,0.0,svm,exp5
+Web Attack  Brute Force,151,0,151,0.0,svm,exp5
+DoS GoldenEye,1029,0,1029,0.0,svm,exp5
+Web Attack  XSS,65,0,65,0.0,svm,exp5
+DoS Slowhttptest,550,21,529,0.0382,svm,exp5
+DoS slowloris,580,61,519,0.1052,svm,exp5
+BENIGN,227129,77860,149269,0.3428,svm,exp5
+Bot,196,78,118,0.398,svm,exp5
+FTP-Patator,794,390,404,0.4912,svm,exp5
+SSH-Patator,590,293,297,0.4966,svm,exp5
+PortScan,15880,15648,232,0.9854,svm,exp5
