@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Predict &middot; {{ model.upper() }} {{ experiment }}{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+  <div>
+    <div class="section-eyebrow">Live prediction</div>
+    <div class="section-h">{{ model.upper() }} &middot; {{ experiment }}</div>
+  </div>
+  <form method="get" action="{{ url_for('predict') }}" class="d-flex gap-2">
+    <select class="form-select" name="model" style="min-width:120px">
+      {% for m in models %}<option value="{{ m }}" {% if m==model %}selected{% endif %}>{{ m.upper() }}</option>{% endfor %}
+    </select>
+    <select class="form-select" name="experiment" style="min-width:110px">
+      {% for e in experiments %}<option value="{{ e }}" {% if e==experiment %}selected{% endif %}>{{ e }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-app">Switch</button>
+  </form>
+</div>
+
+{% if error %}
+  <div class="card-app mb-4" style="border-color: rgba(251,191,36,0.4)">
+    <div class="d-flex align-items-start gap-3">
+      <span class="status-dot status-missing mt-2"></span>
+      <div>
+        <h6 style="color: var(--warning)">Model artifact unavailable</h6>
+        <p class="lede mb-0">{{ error }}</p>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% if schema %}
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card-app">
+      <div class="section-eyebrow">Input</div>
+      <h6 class="mb-2">Feature values</h6>
+      <p class="lede mb-3">
+        Values are entered post-scaling (the saved scaler is applied
+        internally on numeric columns). Use the sample buttons to pre-fill
+        from a real row in the prepared data.
+      </p>
+
+      <form method="post" action="{{ url_for('predict', model=model, experiment=experiment) }}" class="mb-3">
+        <div class="d-flex gap-2 flex-wrap align-items-end">
+          <div style="min-width:160px">
+            <label class="form-label">Sample from</label>
+            <select class="form-select" name="sample_dataset">
+              {% for d in datasets %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+            </select>
+          </div>
+          <button class="btn btn-danger-app" name="action" value="sample"
+                  formmethod="post"
+                  onclick="this.nextElementSibling.value='attack'">Sample ATTACK row</button>
+          <input type="hidden" name="kind" value="attack">
+        </div>
+      </form>
+      <form method="post" action="{{ url_for('predict', model=model, experiment=experiment) }}" class="mb-4">
+        <input type="hidden" name="sample_dataset" value="kdd_test">
+        <input type="hidden" name="action" value="sample">
+        <input type="hidden" name="kind" value="benign">
+        <button class="btn btn-success-app">Sample BENIGN row</button>
+      </form>
+
+      <form method="post" action="{{ url_for('predict', model=model, experiment=experiment) }}">
+        <input type="hidden" name="action" value="predict">
+        <div class="row g-2">
+          {% for f in schema %}
+            <div class="col-md-6">
+              <label class="form-label">{{ f.name }}</label>
+              <input type="number" step="any" class="form-control" name="{{ f.name }}"
+                value="{{ '%.6g'|format(prefill[f.name]) if prefill and f.name in prefill else '0' }}">
+            </div>
+          {% endfor %}
+        </div>
+        <button class="btn btn-primary-app w-100 mt-3">Run prediction &rarr;</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    {% if result %}
+      <div class="card-app mb-3">
+        <div class="section-eyebrow">Verdict</div>
+        <div class="text-center my-3">
+          <span class="verdict {% if result.prediction == 1 %}attack{% else %}benign{% endif %}">
+            {% if result.prediction == 1 %}&#9888;{% else %}&#10003;{% endif %} {{ result.label }}
+          </span>
+        </div>
+        <table class="table-app w-100 mt-3">
+          <tr><td class="muted">Model</td><td class="text-end">{{ result.model }}</td></tr>
+          <tr><td class="muted">Experiment</td><td class="text-end mono">{{ result.experiment }}</td></tr>
+          <tr><td class="muted">Score</td><td class="text-end mono">{{ "%.4f"|format(result.score) }}</td></tr>
+        </table>
+      </div>
+    {% endif %}
+
+    <div class="card-app mb-3">
+      <div class="section-eyebrow">Bulk</div>
+      <h6>Predict from CSV</h6>
+      <p class="lede mb-3">
+        Upload a CSV with the same feature columns. Returns the first 50 rows scored.
+      </p>
+      <input type="file" class="form-control mb-2" id="csvFile" accept=".csv">
+      <button class="btn btn-app w-100" type="button" onclick="uploadCsv()">Upload &amp; predict</button>
+      <pre id="csvOut" class="mt-3" style="max-height: 240px; overflow:auto; display:none"></pre>
+    </div>
+
+    <div class="card-app">
+      <div class="section-eyebrow">Evaluation</div>
+      <h6>Run on a prepared dataset</h6>
+      <p class="lede mb-3">
+        Run the model over an experiment CSV and report F1 / precision / recall.
+      </p>
+      <div class="d-flex gap-2">
+        <select id="evalDataset" class="form-select">
+          {% for d in datasets %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-app" onclick="runEval()">Run</button>
+      </div>
+      <pre id="evalOut" class="mt-3" style="display:none"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+async function uploadCsv() {
+  const fileInput = document.getElementById('csvFile');
+  if (!fileInput.files.length) { alert('Please pick a file first'); return; }
+  const fd = new FormData();
+  fd.append('file', fileInput.files[0]);
+  const r = await fetch(`/predict/csv?model={{ model }}&experiment={{ experiment }}`, {method: 'POST', body: fd});
+  const j = await r.json();
+  const out = document.getElementById('csvOut');
+  out.textContent = JSON.stringify(j, null, 2);
+  out.style.display = 'block';
+}
+async function runEval() {
+  const ds = document.getElementById('evalDataset').value;
+  const r = await fetch(`/evaluate?model={{ model }}&experiment={{ experiment }}&dataset=${ds}`);
+  const j = await r.json();
+  const out = document.getElementById('evalOut');
+  out.textContent = JSON.stringify(j, null, 2);
+  out.style.display = 'block';
+}
+</script>
+{% endif %}
+{% endblock %}

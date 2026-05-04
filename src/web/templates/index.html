@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}NIDS Demo &middot; Home{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="section-eyebrow">Network Protocols &amp; Security</div>
+  <h1>Cross-dataset generalization in ML-based intrusion detection</h1>
+  <p>
+    Interactive demo for the dataset-shift study. Browse saved metrics across
+    18 trained model/experiment pairs, run live predictions on individual
+    flows, or compare every run side-by-side.
+  </p>
+  <div class="hero-meta">
+    <span>Models: <b>3</b> (LR, RF, SVM)</span>
+    <span>Experiments: <b>6</b> (EXP0 &ndash; EXP5)</span>
+    <span>Datasets: <b>NSL-KDD &amp; CICIDS 2017</b></span>
+    <span>Patterns: <b>Strategy &middot; Facade</b></span>
+  </div>
+</section>
+
+<div class="row g-3 mb-4">
+
+  <div class="col-lg-4">
+    <div class="card-app hoverable h-100">
+      <div class="section-eyebrow">Step 1</div>
+      <h4>Browse a result</h4>
+      <p class="lede mb-3">
+        Pick a trained model and experiment to see saved metrics, per-attack
+        catch rates, and the matching figures from <code>results/</code>.
+      </p>
+      <form id="browseForm" onsubmit="goBrowse(event)">
+        <div class="mb-2">
+          <label class="form-label">Model</label>
+          <select class="form-select" id="browseModel">
+            {% for m in models %}<option value="{{ m }}">{{ m.upper() }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Experiment</label>
+          <select class="form-select" id="browseExp">
+            {% for e in experiments %}
+              <option value="{{ e }}">{{ e }} &mdash; {{ descriptions[e] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="btn btn-primary-app w-100">View results &rarr;</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-app hoverable h-100">
+      <div class="section-eyebrow">Step 2</div>
+      <h4>Live predict</h4>
+      <p class="lede mb-3">
+        Enter feature values (or sample a real row) and see the model's
+        verdict. Requires the corresponding <code>.pkl</code> in
+        <code>models/</code>.
+      </p>
+      <form action="{{ url_for('predict') }}" method="get">
+        <div class="mb-2">
+          <label class="form-label">Model</label>
+          <select class="form-select" name="model">
+            {% for m in models %}<option value="{{ m }}">{{ m.upper() }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Experiment</label>
+          <select class="form-select" name="experiment">
+            {% for e in experiments %}<option value="{{ e }}">{{ e }}</option>{% endfor %}
+          </select>
+        </div>
+        <button class="btn btn-success-app w-100">Open predictor &rarr;</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-app hoverable h-100 d-flex flex-column">
+      <div class="section-eyebrow">Step 3</div>
+      <h4>Compare all 18 runs</h4>
+      <p class="lede mb-3">
+        Pivot of within-dataset vs cross-dataset F1 across every (model,
+        experiment) pair &mdash; the headline of the study.
+      </p>
+      <div class="mt-auto">
+        <a href="{{ url_for('compare') }}" class="btn btn-app w-100">Open comparison &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card-app mb-4">
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+      <div class="section-eyebrow">Artefact registry</div>
+      <h5 class="mb-0">Model availability</h5>
+    </div>
+    <div class="small muted">
+      <span class="status-dot status-ready"></span>ready &nbsp;
+      <span class="status-dot status-missing"></span>train to enable
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table-app w-100 text-center">
+      <thead>
+        <tr>
+          <th class="text-start">Model</th>
+          {% for e in experiments %}<th>{{ e }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in models %}
+          <tr>
+            <td class="text-start"><strong>{{ m.upper() }}</strong></td>
+            {% for e in experiments %}
+              <td>
+                {% if availability[m][e] %}
+                  <span class="status-dot status-ready"></span><span class="small">ready</span>
+                {% else %}
+                  <span class="status-dot status-missing"></span><span class="small muted">missing</span>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if results %}
+<div class="card-app">
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+      <div class="section-eyebrow">Published metrics</div>
+      <h5 class="mb-0">All experiments</h5>
+    </div>
+    <span class="small muted mono">results/experiment_results.csv</span>
+  </div>
+  <div class="table-responsive">
+    <table class="table-app w-100">
+      <thead>
+        <tr>
+          <th>Model</th><th>Exp</th>
+          <th>Within F1</th><th>Cross F1</th>
+          <th>Within P</th><th>Within R</th>
+          <th>Cross P</th><th>Cross R</th>
+          <th>Drop</th><th>#feat</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+          <tr>
+            <td><strong>{{ r.model }}</strong></td>
+            <td><span class="mono">{{ r.experiment }}</span></td>
+            <td class="mono">{{ "%.4f"|format(r.within_f1) }}</td>
+            <td class="mono">{{ "%.4f"|format(r.cross_f1) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.within_precision) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.within_recall) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.cross_precision) }}</td>
+            <td class="mono muted">{{ "%.4f"|format(r.cross_recall) }}</td>
+            <td class="mono" style="color: var(--warning)">{{ "%.4f"|format(r.performance_drop) }}</td>
+            <td>{{ r.num_features }}</td>
+            <td>
+              <a href="{{ url_for('view_results',
+                   model=({'LogisticRegression':'lr','RandomForest':'rf','SVM':'svm'}[r.model]),
+                   experiment=r.experiment) }}"
+                 class="btn btn-app btn-sm">open</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<script>
+function goBrowse(ev) {
+  ev.preventDefault();
+  const m = document.getElementById('browseModel').value;
+  const e = document.getElementById('browseExp').value;
+  window.location = `/results/${m}/${e}`;
+}
+</script>
+{% endblock %}
