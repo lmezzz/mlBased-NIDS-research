@@ -18,6 +18,463 @@
 
 ---
 
+## Summary
+
+### Problem Statement
+
+When deploying intrusion detection models across different network environments, performance dramatically degrades. A model trained on NSL-KDD achieves 73-80% F1 on held-out NSL-KDD data, but only 2-30% on CICIDS 2017. **Why do models fail so catastrophically on new datasets?**
+
+This research investigates whether **protocol-level features** (TCP flags, traffic patterns) that appear discriminative on one dataset become liabilities on another due to fundamental differences in how attacks manifest in different network environments.
+
+### Research Hypothesis
+
+Protocol-aware features (SYN ratios, RST flags, etc.) encode dataset-specific attack patterns:
+- **NSL-KDD (1999 simulated attacks):** Heavy use of scanning (RST flags), SYN floods, sequential patterns
+- **CICIDS 2017 (modern attacks):** HTTP floods, Brute-force attempts, GRE tunneling, minimal flag usage
+
+**Hypothesis:** Models trained with protocol features overfit to NSL-KDD's attack signatures. When deployed on CICIDS 2017, these features become anti-correlated or noisy, causing model collapse.
+
+### Core Findings
+
+| Finding | Evidence | Implication |
+|---------|----------|-------------|
+| **Protocol features worsen generalization** | Best cross-F1 is SVM EXP0 (0.3011) with NO protocol features | Protocol features are dataset-specific, not universal |
+| **rst_ratio is catastrophic** | Adding it drops F1 from 0.23 → 0.02 (90% collapse) | RST scanning is NSL-KDD-specific; CICIDS uses HTTP/application-level attacks |
+| **SVM shows maximum paradox** | Best within-dataset (0.7881) becomes worst cross-dataset (0.0201) | Maximum margin hyperplane is directionally reversed between datasets |
+| **syn_ratio is benign** | Minimal cross-F1 damage when added | SYN ratio is near-zero in both datasets; provides no discriminative signal |
+| **LR EXP4 unexpectedly excels** | Achieves 0.3105 cross-F1 (best overall) | Payload presence (data_pkt_ratio) partially transfers across datasets |
+| **Within-F1 ≠ Real-world performance** | RF EXP5: 0.8247 within, 0.1519 cross | Benchmark overfitting masks generalization failure |
+
+### Methodological Approach
+
+**Controlled Experiment Design:**
+1. Start with minimal baseline (EXP0): duration, bytes, simple ratios
+2. Incrementally add protocol features (EXP1–EXP5)
+3. Isolate impact of each feature on cross-dataset performance
+4. Test across 3 ML algorithms (Logistic Regression, Random Forest, SVM)
+5. Compare 18 experimental runs (6 variants × 3 models)
+
+**Evaluation Strategy:**
+- **Within-dataset:** Train on NSL-KDD, test on NSL-KDD test set
+- **Cross-dataset:** Train on NSL-KDD, test on CICIDS 2017
+- **Metric:** F1-score (primary), Recall, Precision (secondary)
+- **Per-attack analysis:** Breakdown by attack type (DoS, Probe, R2L, U2R, etc.)
+
+### Why This Matters
+
+**Real-world impact:**
+- IDS systems fail when deployed in new environments (requires expensive retraining)
+- Features that work in lab conditions (NSL-KDD) don't work in production (CICIDS)
+- Current practice of optimizing within-dataset F1 is **fundamentally misleading**
+
+**Solution direction:**
+- Focus on dataset-agnostic features (e.g., traffic volume, temporal patterns)
+- Avoid protocol-specific features unless they transfer across environments
+- Use domain adaptation or adversarial training to bridge dataset shift
+- Evaluate on **held-out datasets**, not just held-out test splits
+
+---
+
+## Workflow
+
+### 📊 Complete Pipeline Visualization
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    RAW DATASETS (INPUT)                            │
+│  NSL-KDD: KDDTrain+.arff, KDDTest+.arff | CICIDS: 8 CSV files    │
+└────────────────────┬────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ PHASE 1: DATA CLEANING & VALIDATION (src/cleaner.py)              │
+│  • Remove duplicates                                                │
+│  • Drop NULL values & infinity values                               │
+│  • Verify label columns exist ("class" vs "Label")                 │
+│  • Print dataset statistics                                         │
+│  OUTPUT: Clean dataframes                                           │
+└────────────────────┬────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ PHASE 2: FEATURE EXTRACTION (src/extractor.py)                    │
+│                                                                      │
+│ CONTROL FEATURES (EXP0):                                            │
+│  • duration: connection time                                        │
+│  • src_bytes, dst_bytes: traffic volume                             │
+│  • bytes_per_sec: (src + dst) / duration                            │
+│  • byte_ratio: src_bytes / dst_bytes                                │
+│  • protocol: categorical {tcp, udp, icmp}                           │
+│                                                                      │
+│ PROTOCOL-AWARE VARIANTS:                                            │
+│  EXP1: + syn_ratio (SYN flood intensity)                            │
+│  EXP2: + rst_ratio (port scan signature)                            │
+│  EXP3: + fin_ratio (connection close pattern)                       │
+│  EXP4: + data_pkt_ratio (payload presence)                          │
+│  EXP5: + service_bucket (port-based service tier)                   │
+│                                                                      │
+│ OUTPUT: Feature vectors with 6 different feature sets              │
+└────────────────────┬────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ PHASE 3: PREPROCESSING (src/preprocessor.py)                       │
+│                                                                      │
+│  1. LOG TRANSFORM (handle skewed distributions)                     │
+│     log(src_bytes + 1), log(dst_bytes + 1), log(bytes_per_sec + 1) │
+│                                                                      │
+│  2. PROTOCOL ENCODING (one-hot)                                     │
+│     protocol_tcp = 1 if protocol=="tcp" else 0                      │
+│     protocol_udp = 1 if protocol=="udp" else 0                      │
+│     protocol_icmp = 1 if protocol=="icmp" else 0                    │
+│                                                                      │
+│  3. FEATURE SCALING (StandardScaler)                                │
+│     ⚠️  CRITICAL: Fit scaler on TRAIN set only                      │
+│     Apply same scaler to TEST & CICIDS (prevent data leakage)       │
+│                                                                      │
+│ OUTPUT: ML-ready numpy arrays                                       │
+└────────────────────┬────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ PHASE 4: DATA ALIGNMENT (src/aligner.py)                           │
+│                                                                      │
+│  • Ensure KDD & CICIDS share exact feature columns                  │
+│  • Map protocol names consistently                                  │
+│  • Reorder columns to match feature specs                           │
+│  • Save 6 sets of CSVs (EXP0–EXP5)                                  │
+│                                                                      │
+│  KDD: kdd_train_exp0.csv, kdd_test_exp0.csv (× 6)                  │
+│  CICIDS: cicids_exp0.csv, cicids_exp1.csv (× 6)                    │
+│                                                                      │
+│ OUTPUT: 18 processed CSV files                                      │
+└────────────────────┬────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ PHASE 5: MODEL TRAINING (src/models/*.py)                          │
+│                                                                      │
+│  FOR EACH (Model, Experiment):                                      │
+│    1. Load processed CSVs (e.g., kdd_train_exp0.csv)                │
+│    2. Separate X (features) and y (labels)                          │
+│    3. Initialize model:                                             │
+│       • LogisticRegression(max_iter=1000, random_state=42)          │
+│       • RandomForestClassifier(n_estimators=100, random_state=42)   │
+│       • SVC(kernel='rbf', probability=True, random_state=42)        │
+│    4. Train on NSL-KDD                                              │
+│    5. Predict on NSL-KDD TEST (within-dataset)                      │
+│    6. Predict on CICIDS (cross-dataset) ← KEY EVALUATION            │
+│    7. Calculate metrics: F1, Recall, Precision                      │
+│    8. Save model + scaler + feature_cols as .pkl                    │
+│                                                                      │
+│  OUTPUT: 18 model artifacts (3 models × 6 experiments)              │
+│  • lr_exp0.pkl, lr_exp1.pkl, ..., lr_exp5.pkl                       │
+│  • rf_exp0.pkl, rf_exp1.pkl, ..., rf_exp5.pkl                       │
+│  • svm_exp0.pkl, svm_exp1.pkl, ..., svm_exp5.pkl                    │
+└────────────────────┬────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ PHASE 6: ANALYSIS & INSIGHT EXTRACTION (src/experiments/)          │
+│                                                                      │
+│  Feature Importance Analysis:                                       │
+│  • Extract feature weights from each model                          │
+│  • For Random Forest: use model.feature_importances_                │
+│  • For Logistic Regression: use abs(model.coef_)                    │
+│  • Output: feature_importance_{model}_exp{n}.csv                    │
+│                                                                      │
+│  Attack Breakdown Analysis:                                         │
+│  • For each (model, experiment):                                    │
+│    - Group predictions by attack type                               │
+│    - Calculate catch rate (recall) per attack                       │
+│    - Output: attack_breakdown_{model}_exp{n}.csv                    │
+│                                                                      │
+│ OUTPUT: CSV files for visualization                                 │
+└────────────────────┬────────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ PHASE 7: INTERACTIVE DASHBOARD (src/web/app.py)                    │
+│                                                                      │
+│  Strategy Pattern (src/strategies/):                                │
+│  • Each model type has a Strategy class                             │
+│  • Loads .pkl → extracts model, scaler, feature_cols                │
+│  • Makes predictions on user input                                  │
+│                                                                      │
+│  Three Dashboard Modes:                                             │
+│  1. BROWSE: View all 18 experiments' metrics                        │
+│  2. PREDICT: Enter features → get BENIGN/ATTACK verdict             │
+│  3. COMPARE: Side-by-side F1 across all runs                        │
+│                                                                      │
+│  Launch: python main.py → http://127.0.0.1:5000                     │
+│                                                                      │
+│ OUTPUT: Interactive web interface                                   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 🔄 Detailed Phase Descriptions
+
+#### PHASE 1: Data Cleaning
+**Purpose:** Remove noise and inconsistencies in raw data
+
+```python
+# KDD Cleaning (src/cleaner.py)
+def clean_kdd(df):
+    df.drop_duplicates(inplace=True)           # Remove duplicate records
+    df.dropna(inplace=True)                    # Remove NULLs
+    df[str_cols] = df[str_cols].str.strip()    # Remove whitespace
+    assert "class" in df.columns                # Verify label column
+    return df
+
+# CICIDS Cleaning
+def clean_cicids(df):
+    df.columns = df.columns.str.strip()        # Clean column names
+    df.replace([np.inf, -np.inf], np.nan)      # Handle infinity (from division)
+    df.dropna(inplace=True)
+    df.drop_duplicates(inplace=True)
+    assert "Label" in df.columns
+    return df
+```
+
+**Example:**
+- **Input:** KDD: 567,498 rows | CICIDS: 2,830,743 rows
+- **After removal:** KDD: 567,294 rows | CICIDS: 2,827,876 rows
+- **Why?** Duplicates & NULLs cause sklearn to crash
+
+---
+
+#### PHASE 2: Feature Extraction
+**Purpose:** Create meaningful features from raw columns
+
+```python
+# Control Features (baseline, no protocol info)
+df["bytes_per_sec"] = (df["src_bytes"] + df["dst_bytes"]) / (df["duration"] + 1e-6)
+df["byte_ratio"] = df["src_bytes"] / (df["dst_bytes"] + 1)
+
+# Protocol-Aware Features (protocol-specific attack patterns)
+df["syn_ratio"] = df["SYN_Flag_Count"] / df["Total_Fwd_Packets"]
+df["rst_ratio"] = df["RST_Flag_Count"] / df["Total_Fwd_Packets"]
+df["fin_ratio"] = df["FIN_Flag_Count"] / df["Total_Fwd_Packets"]
+```
+
+**Feature Engineering Strategy:**
+| Feature | Why Extract | Dataset-Specific? | Transfers? |
+|---------|-------------|-------------------|-----------|
+| `bytes_per_sec` | Higher for floods & DoS | Both have it | ✅ Yes |
+| `byte_ratio` | Unidirectional vs bidirectional | Both relevant | ✅ Likely |
+| `syn_ratio` | SYN flood signature | NSL-KDD heavy | ❌ No (near-zero in CICIDS) |
+| `rst_ratio` | Port scanning signature | NSL-KDD heavy | ❌ No (obsolete attack) |
+| `data_pkt_ratio` | Payload vs overhead | Both relevant | ✅ Partially |
+
+---
+
+#### PHASE 3: Preprocessing
+**Purpose:** Convert raw features into ML-friendly format
+
+```python
+# 3a. Log Transform (handle right-skewed distributions)
+df["src_bytes"] = np.log1p(df["src_bytes"])      # log(x+1) to avoid log(0)
+df["dst_bytes"] = np.log1p(df["dst_bytes"])
+
+# 3b. Protocol Encoding (convert categorical to numeric)
+df["protocol_tcp"] = (df["protocol"] == "tcp").astype(int)
+df["protocol_udp"] = (df["protocol"] == "udp").astype(int)
+df["protocol_icmp"] = (df["protocol"] == "icmp").astype(int)
+
+# 3c. Feature Scaling (normalize to mean=0, std=1)
+scaler = StandardScaler()
+scaler.fit(X_train_numeric)                      # FIT on train only!
+X_train_scaled = scaler.transform(X_train)
+X_test_scaled = scaler.transform(X_test)         # Reuse same scaler
+X_cicids_scaled = scaler.transform(X_cicids)     # NO fitting here!
+```
+
+**Why StandardScaler matters:**
+- Log Regression converges faster
+- Random Forest becomes more balanced
+- SVM requires normalized features for kernel computation
+
+⚠️ **Critical:** Never fit scaler on test or cross-dataset. That's **data leakage**.
+
+---
+
+#### PHASE 4: Data Alignment
+**Purpose:** Ensure KDD & CICIDS have identical feature columns
+
+```python
+# After feature extraction:
+# KDD has:  ["duration", "protocol", "src_bytes", ..., "label"]
+# CICIDS has: ["duration", "protocol", "src_bytes", ..., "Label"]
+
+# Alignment (src/aligner.py):
+df.rename(columns={"Label": "label"})            # Unify label name
+df = df[FEATURE_COLS]                            # Select in same order
+df.to_csv("data/processed/cicids_exp0.csv")      # Save aligned version
+```
+
+**Why alignment matters:** ML models expect X.shape = (n_samples, n_features). If feature order differs between train & test, predictions become random.
+
+---
+
+#### PHASE 5: Model Training
+**Purpose:** Train ML models and evaluate within-dataset vs cross-dataset
+
+```python
+# Load processed datasets
+train = pd.read_csv("data/processed/kdd_train_exp0.csv")
+test = pd.read_csv("data/processed/kdd_test_exp0.csv")
+cicids = pd.read_csv("data/processed/cicids_exp0.csv")
+
+# Split features & labels
+X_train, y_train = train[FEATURE_COLS], train["label"]
+X_test, y_test = test[FEATURE_COLS], test["label"]
+X_cicids, y_cicids = cicids[FEATURE_COLS], cicids["label"]
+
+# Train
+model = LogisticRegression(max_iter=1000, random_state=42)
+model.fit(X_train, y_train)
+
+# WITHIN-DATASET: Test on KDD
+y_pred_test = model.predict(X_test)
+within_f1 = f1_score(y_test, y_pred_test)
+
+# CROSS-DATASET: Test on CICIDS ← THE KEY TEST
+y_pred_cicids = model.predict(X_cicids)
+cross_f1 = f1_score(y_cicids, y_pred_cicids)
+
+# SAVE ARTIFACT
+artifact = {
+    "model": model,
+    "scaler": scaler,
+    "feature_cols": FEATURE_COLS,
+    "numeric_cols": NUMERIC_COLS,
+    "within_f1": within_f1,
+    "cross_f1": cross_f1
+}
+joblib.dump(artifact, "models/lr_exp0.pkl")
+```
+
+**Output Example:**
+```
+LogReg EXP0:
+  Within-dataset (KDD test) F1: 0.7363 ← Good
+  Cross-dataset (CICIDS) F1: 0.2312 ← 69% drop!
+  Performance drop: 0.5051
+
+LogReg EXP2 (with rst_ratio):
+  Within-dataset F1: 0.7771 ← Even better!
+  Cross-dataset F1: 0.0204 ← CATASTROPHIC!
+  Performance drop: 0.7567
+```
+
+**Key insight:** Adding rst_ratio IMPROVES within-dataset performance but DESTROYS cross-dataset performance. The feature is too dataset-specific.
+
+---
+
+#### PHASE 6: Analysis & Insights
+**Purpose:** Extract patterns from predictions
+
+```python
+# Feature Importance (why did model make decisions?)
+for model_name in ["LogReg", "RandomForest", "SVM"]:
+    for exp in range(6):
+        artifact = joblib.load(f"models/{model_name}_exp{exp}.pkl")
+        model = artifact["model"]
+        
+        # Get importance scores
+        if hasattr(model, "feature_importances_"):  # Tree-based
+            importances = model.feature_importances_
+        else:                                        # Linear
+            importances = abs(model.coef_[0])
+        
+        df_importance = pd.DataFrame({
+            "feature": FEATURE_COLS,
+            "importance": importances
+        }).sort_values("importance", ascending=False)
+        
+        df_importance.to_csv(f"results/{model_name}_exp{exp}_importance.csv")
+
+# Attack Breakdown (which attack types does the model catch?)
+for attack_type in ["DoS", "Probe", "R2L", "U2R", "normal"]:
+    mask = (y_cicids == attack_type)
+    catch_rate = recall_score(y_cicids[mask], y_pred_cicids[mask])
+    print(f"{attack_type}: {catch_rate:.2%} catch rate")
+```
+
+---
+
+#### PHASE 7: Interactive Dashboard
+**Purpose:** Visualize & explore results
+
+```python
+# Strategy Pattern: Abstract model loading
+class LogisticRegressionStrategy:
+    def __init__(self, pkl_path):
+        artifact = joblib.load(pkl_path)
+        self.model = artifact["model"]
+        self.scaler = artifact["scaler"]
+        self.feature_cols = artifact["feature_cols"]
+        self.numeric_cols = artifact["numeric_cols"]
+    
+    def predict(self, feature_dict):
+        # Convert user input → proper format
+        X = pd.DataFrame([feature_dict])[self.feature_cols]
+        
+        # Scale using saved scaler
+        X[self.numeric_cols] = self.scaler.transform(X[self.numeric_cols])
+        
+        # Predict
+        pred = self.model.predict(X)
+        proba = self.model.predict_proba(X)
+        
+        return {
+            "prediction": "ATTACK" if pred[0] == 1 else "BENIGN",
+            "confidence": proba[0].max()
+        }
+
+# Flask routes
+@app.route("/predict", methods=["POST"])
+def predict():
+    data = request.json
+    strategy = get_strategy(data["model"])
+    result = strategy.predict(data["features"])
+    return jsonify(result)
+```
+
+### 🚀 Quick Start Commands
+
+```bash
+# Full end-to-end pipeline
+python scripts/combine_cicids.py  # Prepare CICIDS from raw files
+
+# Build experiment CSVs
+python -c "
+from src.pipeline import run_control_pipeline, run_protocol_aware_pipeline
+run_control_pipeline()
+run_protocol_aware_pipeline()
+"
+
+# Train all models
+python -c "
+from src.models.logistic_regression import *
+from src.models.random_forest import *
+from src.models.svm import *
+[run_logistic_regression_EXP0(), run_logistic_regression_EXP1(), ...]
+[run_random_forest_EXP0(), run_random_forest_EXP1(), ...]
+[run_svm_EXP0(), run_svm_EXP1(), ...]
+"
+
+# Analyze results
+python src/experiments/feature_importance.py
+python src/experiments/attack_breakdown.py
+
+# Launch dashboard
+python main.py
+# Open http://127.0.0.1:5000
+```
+
+---
+
 ## Project Structure
 
 ```
